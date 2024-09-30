@@ -30,3 +30,11 @@ provider_credential_schema:
       placeholder:
         zh_Hans: 在此输入您的 API Key
         en_US: Enter your API Key
+    - variable: api_url
+      label:
+        en_US: API Url
+      type: text-input
+      required: false
+      placeholder:
+        zh_Hans: 在此输入您的自定义Groq API Url
+        en_US: Enter your custom groq API Url

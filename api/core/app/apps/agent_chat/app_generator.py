@@ -8,6 +8,7 @@ from typing import Any, Literal, Union, overload
 from flask import Flask, current_app
 from pydantic import ValidationError
 
+from configs import dify_config
 from core.app.app_config.easy_ui_based_app.model_config.converter import ModelConfigConverter
 from core.app.app_config.features.file_upload.manager import FileUploadConfigManager
 from core.app.apps.agent_chat.app_config_manager import AgentChatAppConfigManager
@@ -124,7 +125,9 @@ class AgentChatAppGenerator(MessageBasedAppGenerator):
             app_config=app_config,
             model_conf=ModelConfigConverter.convert(app_config),
             conversation_id=conversation.id if conversation else None,
-            inputs=conversation.inputs if conversation else self._get_cleaned_inputs(inputs, app_config),
+            inputs=conversation.inputs 
+                if dify_config.USING_INPUT_FROM_CONVERSATION and conversation 
+                else self._get_cleaned_inputs(inputs, app_config),
             query=query,
             files=file_objs,
             user_id=user.id,

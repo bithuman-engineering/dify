@@ -355,6 +355,11 @@ class WorkflowConfig(BaseSettings):
         default=5 * 1024,
     )
 
+    USING_INPUT_FROM_CONVERSATION: bool = Field(
+        description="whether to use input from conversation for chats after the first message",
+        default=True,
+    )
+
 
 class OAuthConfig(BaseSettings):
     """

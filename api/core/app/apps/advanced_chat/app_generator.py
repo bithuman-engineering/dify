@@ -10,6 +10,7 @@ from flask import Flask, current_app
 from pydantic import ValidationError
 
 import contexts
+from configs import dify_config
 from core.app.app_config.features.file_upload.manager import FileUploadConfigManager
 from core.app.apps.advanced_chat.app_config_manager import AdvancedChatAppConfigManager
 from core.app.apps.advanced_chat.app_runner import AdvancedChatAppRunner
@@ -118,7 +119,9 @@ class AdvancedChatAppGenerator(MessageBasedAppGenerator):
             task_id=str(uuid.uuid4()),
             app_config=app_config,
             conversation_id=conversation.id if conversation else None,
-            inputs=conversation.inputs if conversation else self._get_cleaned_inputs(inputs, app_config),
+            inputs=conversation.inputs 
+                if dify_config.USING_INPUT_FROM_CONVERSATION and conversation 
+                else self._get_cleaned_inputs(inputs, app_config),
             query=query,
             files=file_objs,
             user_id=user.id,
