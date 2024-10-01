@@ -1,0 +1,44 @@
+name: Rub Build and Push
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: FranzDiebold/github-env-vars-action@v2
+      - name: Print environment variables
+        run: echo "CI_ACTION_REF_NAME_SLUG=$CI_ACTION_REF_NAME_SLUG" >> $GITHUB_ENV
+
+      - name: Set TAG_NAME or slug as environment variable
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
+          else
+            echo "TAG_NAME=${{ env.CI_ACTION_REF_NAME_SLUG }}" >> $GITHUB_ENV
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.0
+
+      - name: Log in to docker registry
+        uses: azure/docker-login@v2
+        with:
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.6.1
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6.8.0
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.REGISTRY_LOGIN_SERVER }}/wukong/dify:${{ env.TAG_NAME }}
